@@ -48,7 +48,9 @@ import {ref} from "vue";
 let props = defineProps({
   toggle: String,
   startDateSet: null,
-  endDateSet: null
+  endDateSet: null,
+  startDate: Object,
+  endDate: Object
 })
 
 let timeFull = ref(false)
@@ -64,10 +66,33 @@ let endDayMinutes = ref('00')
 // End day time *end*
 
 // Emit when time is set *start*
-const emit = defineEmits(['timeDataCollected'])
+let emit = defineEmits(['timeDataCollected'])
 
 let timeDataCollect = () => {
   if (props.startDateSet !== null && props.endDateSet !== null) {
+    console.log(props.startDate)
+    // Time validation if same day and start hour is bigger then end hour
+    if (props.startDate.year === props.endDate.year
+        && props.startDate.month === props.endDate.month
+        && props.startDate.day === props.endDate.day
+        && startDayHour.value > endDayHour.value) {
+      startDayHour.value = '24'
+      endDayHour.value = '24'
+      startDayMinutes.value = '00'
+      endDayMinutes.value = '00'
+      alert('Start day hour is bigger then end day hour')
+    }
+  // Time validation if same day and same hour but start minutes are bigger then end minutes
+    if (props.startDate.year === props.endDate.year
+        && props.startDate.month === props.endDate.month
+        && props.startDate.day === props.endDate.day
+        && startDayHour.value === endDayHour.value
+        && startDayMinutes.value > endDayMinutes.value) {
+      startDayHour.value = '24'
+      endDayHour.value = '24'
+      startDayMinutes.value = '00'
+      endDayMinutes.value = '00'
+    }
     emit('timeDataCollected', [startDayHour.value, startDayMinutes.value, endDayHour.value, endDayMinutes.value])
   }
 }

@@ -69,7 +69,8 @@
         </div>
       </div>
     </Transition>
-    <Time :toggle="timeToggle" @timeDataCollected="timeSet" :startDateSet="startDate" :endDateSet="endDate"></Time>
+    <Time :toggle="timeToggle" @timeDataCollected="timeSet" :startDateSet="startDate" :endDateSet="endDate"
+          :startDate="start" :endDate="end"></Time>
     <Templates :toggle="templatesToggle" @templateDataCollected="templateSet"></Templates>
   </div>
 </template>
@@ -89,19 +90,24 @@ let year = moment().year()
 let month = moment().format("MMMM")
 //Moment variables for readable code *end*
 
-const range = ref([])
+let range = ref([])
 let endDateInput = ref(null)
 let startDateInput = ref(null)
 
 let startDate = ref(null)
 let endDate = ref(null)
 
-let startDay = ref(null)
-let endDay = ref(null)
-let startMonth = ref(null)
-let endMonth = ref(null)
-let startYear = ref(null)
-let endYear = ref(null)
+let start = ref({
+  day: null,
+  month: null,
+  year: null
+})
+
+let end = ref({
+  day: null,
+  month: null,
+  year: null
+})
 
 let selecting = ref(false)
 
@@ -118,23 +124,23 @@ let time = ref({
 })
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Calendar logic *start*
-const monthStart = moment().startOf('month');
-const monthEnd = moment().endOf('month');
+let monthStart = moment().startOf('month');
+let monthEnd = moment().endOf('month');
 
 let startTime = ref(monthStart)
 let endTime = ref(monthEnd)
 
 
-const previous = (unit) => {
+let previous = (unit) => {
   startTime.value = startTime.value.clone().subtract(1, `${unit}`);
   endTime.value = endTime.value.clone().subtract(1, `${unit}`);
 }
-const next = (unit) => {
+let next = (unit) => {
   startTime.value = startTime.value.clone().add(1, `${unit}`);
   endTime.value = endTime.value.clone().add(1, `${unit}`);
 }
-const getFirstMonthWeeks = () => {
-  const firstMonthDays = [];
+let getFirstMonthWeeks = () => {
+  let firstMonthDays = [];
   let currentDay = startTime.value.clone().startOf('week');
   while (currentDay.isBefore(startTime.value.clone().endOf('month'))) {
     firstMonthDays.push(currentDay);
@@ -142,12 +148,12 @@ const getFirstMonthWeeks = () => {
   }
   return chunkByWeek(firstMonthDays);
 }
-const isToday = (day) => {
+let isToday = (day) => {
   return moment().isSame(day, 'day');
 }
 
-const chunkByWeek = (arr) => {
-  const result = [];
+let chunkByWeek = (arr) => {
+  let result = [];
   let temp = [];
   for (let i = 0; i < arr.length; i += 1) {
     temp.push(arr[i]);
@@ -161,21 +167,21 @@ const chunkByWeek = (arr) => {
   }
   return result;
 }
-const getWeekDays = (week) => {
-  const result = [];
+let getWeekDays = (week) => {
+  let result = [];
   for (let i = 0; i < week.length; i += 1) {
-    const day = week[i];
+    let day = week[i];
     result.push(day);
   }
   return result;
 }
 
 
-const getCurrentMonth = computed(() => {
+let getCurrentMonth = computed(() => {
   return startTime.value.format('MMMM');
 })
 
-const getCurrentYear = computed(() => {
+let getCurrentYear = computed(() => {
   return startTime.value.format('YYYY');
 })
 // Calendar logic *end*
@@ -194,37 +200,37 @@ let initDay = (day) => {
 let selectDate = (day) => {
   selecting.value = true
   if (startDateInit.value === true) {
-    endDay.value = null
-    endMonth.value = null
-    endYear.value = null
+    end.value.day = null
+    end.value.month = null
+    end.value.year = null
     endDate.value = null
-    startDay.value = Number(day.format('D'))
-    startMonth.value = Number(day.format('M'))
-    startYear.value = Number(day.format('Y'))
-    startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
+    start.value.day = Number(day.format('D'))
+    start.value.month = Number(day.format('M'))
+    start.value.year = Number(day.format('Y'))
+    startDate.value = `${start.value.day}/${start.value.month}/${start.value.year}`
     range.value.splice(0, 1, day.format('D'))
     endDateInput.value.focus();
-    if (endYear.value < startYear.value || endMonth.value < startMonth.value || (endYear.value === startYear.value && endMonth.value === startMonth.value && endDay.value < startDay.value)) {
-      endDay.value = null
-      endMonth.value = null
-      endYear.value = null
+    if (end.value.year < start.value.year || end.value.month < start.value.month || (end.value.year === start.value.year && end.value.month === start.value.month && end.value.day < start.value.day)) {
+      end.value.day = null
+      end.value.month = null
+      end.value.year = null
       endDate.value = null
       range.value.splice(0, 1, day.format('D'))
     }
   } else {
-    endDay.value = Number(day.format('D'))
-    endMonth.value = Number(day.format('M'))
-    endYear.value = Number(day.format('Y'))
-    endDate.value = `${endDay.value}/${endMonth.value}/${endYear.value}`
+    end.value.day = Number(day.format('D'))
+    end.value.month = Number(day.format('M'))
+    end.value.year = Number(day.format('Y'))
+    endDate.value = `${end.value.day}/${end.value.month}/${end.value.year}`
     range.value.splice(1, 1, day.format('D'))
-    if (endYear.value < startYear.value || endMonth.value < startMonth.value || (endYear.value === startYear.value && endMonth.value === startMonth.value && endDay.value < startDay.value)) {
-      startDay.value = Number(day.format('D'))
-      startMonth.value = Number(day.format('M'))
-      startYear.value = Number(day.format('Y'))
-      startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
-      endDay.value = null
-      endMonth.value = null
-      endYear.value = null
+    if (end.value.year < start.value.year || end.value.month < start.value.month || (end.value.year === start.value.year && end.value.month === start.value.month && end.value.day < start.value.day)) {
+      start.value.day = Number(day.format('D'))
+      start.value.month = Number(day.format('M'))
+      start.value.year = Number(day.format('Y'))
+      startDate.value = `${start.value.day}/${start.value.month}/${start.value.year}`
+      end.value.day = null
+      end.value.month = null
+      end.value.year = null
       endDate.value = null
       endDateInput.value.focus();
       range.value.splice(1, 1, day.format('D'))
@@ -244,19 +250,19 @@ let timeSet = (childArr) => {
   time.value.startDayMinutes = childArr[1]
   time.value.endDayHour = childArr[2]
   time.value.endDayMinutes = childArr[3]
-  startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value} - ${time.value.startDayHour}:${time.value.startDayMinutes}`
-  endDate.value = `${endDay.value}/${endMonth.value}/${endYear.value} - ${time.value.endDayHour}:${time.value.endDayMinutes}`
+  startDate.value = `${start.value.day}/${start.value.month}/${start.value.year} - ${time.value.startDayHour}:${time.value.startDayMinutes}`
+  endDate.value = `${end.value.day}/${end.value.month}/${end.value.year} - ${time.value.endDayHour}:${time.value.endDayMinutes}`
 }
 // Data from template component emiter
 let templateSet = (childObj) => {
-  startDay.value = childObj.date.startDay.format('DD')
-  startMonth.value = childObj.date.startDay.format('MM')
-  startYear.value = childObj.date.startDay.format('YYYY')
-  endDay.value = childObj.date.endDay.format('DD')
-  endMonth.value = childObj.date.endDay.format('MM')
-  endYear.value = childObj.date.endDay.format('YYYY')
-  endDate.value = `${endDay.value}/${endMonth.value}/${endYear.value}`
-  startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
+  start.value.day = childObj.date.startDay.format('DD')
+  start.value.month = childObj.date.startDay.format('MM')
+  start.value.year = childObj.date.startDay.format('YYYY')
+  end.value.day = childObj.date.endDay.format('DD')
+  end.value.month = childObj.date.endDay.format('MM')
+  end.value.year = childObj.date.endDay.format('YYYY')
+  endDate.value = `${end.value.day}/${end.value.month}/${end.value.year}`
+  startDate.value = `${start.value.day}/${start.value.month}/${start.value.year}`
 }
 
 </script>
