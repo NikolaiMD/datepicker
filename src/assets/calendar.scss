@@ -1,0 +1,182 @@
+.calendar-init {
+  display: flex;
+  flex-direction: row;
+}
+
+.calendar-init__date {
+  color: $burst;
+  width: 50%;
+  padding: 7px 5px;
+  border-radius: 10px;
+  border: 1px solid $viking;
+  background-color: $alabaster;
+  transition: .3s;
+  font-size: 16px;
+  font-family: "Jost Medium", sans-serif;
+
+  &:focus {
+    outline: none;
+    border-color: $lochinvar;
+  }
+}
+
+.calendar-init__arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $burst;
+  font-size: 20px;
+  margin: 0 10px;
+}
+
+.day {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: .3s;
+
+  &.today {
+    border: 1px solid $main-light;
+  }
+
+  &.selecting {
+    border-color: #4fd1c5;
+  }
+
+  &.selected {
+    background-color: #4fd1c5;
+  }
+
+  &:hover {
+    background-color: $secondary-dark;
+    cursor: pointer;
+
+    &.selected {
+      background-color: #4fd1c5;
+    }
+  }
+}
+
+.calendar {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.calendars-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.calendar-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.calendar-header__year, .calendar-header__month {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  h2 {
+    margin: 0;
+  }
+
+  button {
+    background-color: transparent;
+    color: $burst;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    transition: .3s;
+    margin: 0 10px;
+    font-size: 24px;
+
+    &:hover {
+      cursor: pointer;
+      background-color: $viking;
+      color: $main-light;
+    }
+  }
+}
+
+.calendar-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.calendar-row > div {
+  width: 35px;
+  padding: 10px;
+}
+
+.today {
+  border: 1px solid red;
+}
+
+.time-init-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.time-init {
+  display: flex;
+  flex-direction: row;
+  width: 50%;
+}
+
+body {
+  &.light {
+    .day {
+      &.today {
+        border: 1px solid $viking;
+      }
+
+      &.selecting {
+        border-color: #4fd1c5;
+      }
+
+      &.selected {
+        background-color: #4fd1c5;
+      }
+
+      &:hover {
+        background-color: $viking;
+        color: $main-light;
+        cursor: pointer;
+
+        &.selected {
+          background-color: #4fd1c5;
+        }
+      }
+    }
+  }
+
+  &.dark {
+    .calendar-init__date {
+      color: $main-light;
+      border: 1px solid $emperor;
+      background-color: $secondary-dark;
+
+      &:focus {
+        border-color: $main-light;
+      }
+    }
+
+    .calendar-header__year, .calendar-header__month {
+      button {
+        color: $main-light;
+        &:hover{
+          background-color: $secondary-dark;
+        }
+      }
+    }
+
+    .calendar-init__arrow {
+      color: $main-light;
+    }
+  }
+}

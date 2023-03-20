@@ -1,0 +1,37 @@
+.time-init__hour, .time-init__minutes {
+  width: 50%;
+  padding: 7px 5px;
+  border-radius: 10px;
+  transition: .3s;
+  font-size: 16px;
+  font-family: "Jost Medium", sans-serif;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+
+}
+
+body {
+  &.light {
+    .time-init__hour, .time-init__minutes {
+      background-color: $alabaster;
+      border: 1px solid $viking;
+      color: $burst;
+    }
+  }
+
+  &.dark {
+    .time-init__hour, .time-init__minutes {
+      background-color: $secondary-dark;
+      border: 1px solid $emperor;
+      color: $main-light;
+
+      &:focus {
+        outline: none;
+        border-color: $main-light;
+      }
+    }
+  }
+}

@@ -1,0 +1,101 @@
+@import "../../public/fonts/fonts.css";
+@import "variables";
+@import "switcher";
+@import "header";
+@import "sidebar";
+@import "time";
+@import "templates";
+@import "calendar";
+
+body {
+  margin: unset;
+  font-family: "Jost Medium", sans-serif;
+
+  .tile-item {
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+  }
+
+  button.button {
+    padding: 10px;
+    border-radius: 10px;
+    font-family: "Jost Medium", sans-serif;
+    font-size: 16px;
+    transition: .3s;
+
+    &:hover {
+      background-color: $viking;
+      cursor: pointer;
+    }
+  }
+
+  &.light {
+    background-color: $main-light;
+    color: $burst;
+
+    .tile-item {
+      background-color: $mercury;
+    }
+
+    .button {
+      background-color: $alabaster;
+      border: 1px solid $viking;
+      color: $burst;
+    }
+  }
+
+  &.dark {
+    background-color: $main-dark;
+    color: $main-light;
+
+    .tile-item {
+      background-color: $secondary-dark;
+    }
+
+    .button {
+      background-color: transparent;
+      border: 1px solid $emperor;
+      color: $main-light;
+    }
+  }
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  position: absolute;
+  top: 0;
+  right: 30px;
+  width: calc(75% - 90px);
+  padding: 15px;
+}
+
+.main-content__title {
+  margin: 0;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+  padding: 0 15px;
+}
+
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
