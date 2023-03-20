@@ -61,7 +61,7 @@
             <div class="calendar-row" v-for="week in getFirstMonthWeeks()">
               <div v-for="day in getWeekDays(week)"
                    :class="{ today: isToday(day) }" class="day"
-                   v-on:click="selectDate(day); colorDay(day);">
+                   v-on:click="selectDate(day);">
                 <div class="day-number">{{ day.format('D') }}</div>
               </div>
             </div>
@@ -85,11 +85,8 @@ let props = defineProps({
   templatesToggle: String
 })
 //Moment variables for readable code *start*
-
-
 let year = moment().year()
 let month = moment().format("MMMM")
-
 //Moment variables for readable code *end*
 
 const range = ref([])
@@ -120,7 +117,7 @@ let time = ref({
   endDayMinutes: null,
 })
 ////////////////////////////////////////////////////////////////////////////////////////////
-
+// Calendar logic *start*
 const monthStart = moment().startOf('month');
 const monthEnd = moment().endOf('month');
 
@@ -181,6 +178,7 @@ const getCurrentMonth = computed(() => {
 const getCurrentYear = computed(() => {
   return startTime.value.format('YYYY');
 })
+// Calendar logic *end*
 /////////////////////////////////////////////////////////////////////////////////////////////////
 let initDay = (day) => {
   showCalendar.value = true
@@ -192,7 +190,7 @@ let initDay = (day) => {
     endDateInit.value = true
   }
 }
-
+// Selecting dates
 let selectDate = (day) => {
   selecting.value = true
   if (startDateInit.value === true) {
@@ -200,11 +198,12 @@ let selectDate = (day) => {
     endMonth.value = null
     endYear.value = null
     endDate.value = null
-    startDay.value = day.format('D')
-    startMonth.value = day.format('M')
-    startYear.value = day.format('Y')
+    startDay.value = Number(day.format('D'))
+    startMonth.value = Number(day.format('M'))
+    startYear.value = Number(day.format('Y'))
     startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
     range.value.splice(0, 1, day.format('D'))
+    endDateInput.value.focus();
     if (endYear.value < startYear.value || endMonth.value < startMonth.value || (endYear.value === startYear.value && endMonth.value === startMonth.value && endDay.value < startDay.value)) {
       endDay.value = null
       endMonth.value = null
@@ -213,15 +212,15 @@ let selectDate = (day) => {
       range.value.splice(0, 1, day.format('D'))
     }
   } else {
-    endDay.value = day.format('D')
-    endMonth.value = day.format('M')
-    endYear.value = day.format('Y')
+    endDay.value = Number(day.format('D'))
+    endMonth.value = Number(day.format('M'))
+    endYear.value = Number(day.format('Y'))
     endDate.value = `${endDay.value}/${endMonth.value}/${endYear.value}`
     range.value.splice(1, 1, day.format('D'))
     if (endYear.value < startYear.value || endMonth.value < startMonth.value || (endYear.value === startYear.value && endMonth.value === startMonth.value && endDay.value < startDay.value)) {
-      startDay.value = day.format('D')
-      startMonth.value = day.format('M')
-      startYear.value = day.format('Y')
+      startDay.value = Number(day.format('D'))
+      startMonth.value = Number(day.format('M'))
+      startYear.value = Number(day.format('Y'))
       startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
       endDay.value = null
       endMonth.value = null
@@ -231,7 +230,6 @@ let selectDate = (day) => {
       range.value.splice(1, 1, day.format('D'))
     }
   }
-  console.log(range.value)
 }
 
 let colorDay = (day) => {
@@ -240,7 +238,7 @@ let colorDay = (day) => {
     day.format('D') === id + 1 ? item.classList.add('selected') : item.classList.remove('selected')
   })
 }
-
+// Data from time component emiter
 let timeSet = (childArr) => {
   time.value.startDayHour = childArr[0]
   time.value.startDayMinutes = childArr[1]
@@ -249,7 +247,7 @@ let timeSet = (childArr) => {
   startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value} - ${time.value.startDayHour}:${time.value.startDayMinutes}`
   endDate.value = `${endDay.value}/${endMonth.value}/${endYear.value} - ${time.value.endDayHour}:${time.value.endDayMinutes}`
 }
-
+// Data from template component emiter
 let templateSet = (childObj) => {
   startDay.value = childObj.date.startDay.format('DD')
   startMonth.value = childObj.date.startDay.format('MM')
