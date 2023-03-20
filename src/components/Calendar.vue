@@ -204,7 +204,6 @@ let selectDate = (day) => {
     startMonth.value = day.format('M')
     startYear.value = day.format('Y')
     startDate.value = `${startDay.value}/${startMonth.value}/${startYear.value}`
-    endDateInput.value.focus();
     range.value.splice(0, 1, day.format('D'))
     if (endYear.value < startYear.value || endMonth.value < startMonth.value || (endYear.value === startYear.value && endMonth.value === startMonth.value && endDay.value < startDay.value)) {
       endDay.value = null
