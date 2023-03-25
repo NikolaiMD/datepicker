@@ -169,7 +169,8 @@ body {
     .calendar-header__year, .calendar-header__month {
       button {
         color: $main-light;
-        &:hover{
+
+        &:hover {
           background-color: $secondary-dark;
         }
       }
@@ -178,5 +179,18 @@ body {
     .calendar-init__arrow {
       color: $main-light;
     }
+  }
+}
+
+.highlighted {
+  border: 1px dashed $viking;
+  border-radius: 0;
+
+  &.first {
+    border-right-color: transparent;
+  }
+
+  &.last {
+    border-left-color: transparent;
   }
 }

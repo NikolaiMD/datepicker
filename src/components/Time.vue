@@ -70,7 +70,6 @@ let emit = defineEmits(['timeDataCollected'])
 
 let timeDataCollect = () => {
   if (props.startDateSet !== null && props.endDateSet !== null) {
-    console.log(props.startDate)
     // Time validation if same day and start hour is bigger then end hour
     if (props.startDate.year === props.endDate.year
         && props.startDate.month === props.endDate.month

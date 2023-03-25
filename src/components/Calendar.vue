@@ -24,16 +24,16 @@
 
     <Transition>
       <div
-          v-if="showCalendar"
+          v-show="showCalendar"
           v-on:mouseout="showCalendar=true"
           class="calendar">
         <div class="calendar-header">
           <div class="calendar-header__year">
-            <button @click="previous('year')">
+            <button @click="previous('year');">
               &#x2190;
             </button>
             <h2>{{ getCurrentYear }}</h2>
-            <button @click="next('year')">
+            <button @click="next('year');">
               &#x2192;
             </button>
           </div>
@@ -41,8 +41,9 @@
             <button @click="previous('month')">
               &#x2190;
             </button>
-            <h2>{{ getCurrentMonth }}</h2>
-            <button @click="next('month')">
+            <h2>{{ getCurrentMonth(0) }} | </h2>
+            <h2> | {{ getCurrentMonth(1) }}</h2>
+            <button @click="next('month');">
               &#x2192;
             </button>
           </div>
@@ -58,9 +59,27 @@
               <div>Fri</div>
               <div>Sat</div>
             </div>
-            <div class="calendar-row" v-for="week in getFirstMonthWeeks()">
+            <div class="calendar-row" v-for="week in getFirstMonthWeeks(0)">
               <div v-for="day in getWeekDays(week)"
-                   :class="{ today: isToday(day) }" class="day"
+                   :class="[{ today: isToday(day)}, `day-${day.format('DDD')}`]" class="day"
+                   v-on:click="selectDate(day);">
+                <div class="day-number">{{ day.format('D') }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="calendar-body">
+            <div class="calendar-row header">
+              <div>Sun</div>
+              <div>Mon</div>
+              <div>Tue</div>
+              <div>Wed</div>
+              <div>Thu</div>
+              <div>Fri</div>
+              <div>Sat</div>
+            </div>
+            <div class="calendar-row" v-for="week in getFirstMonthWeeks(1)">
+              <div v-for="day in getWeekDays(week)"
+                   :class="[{ today: isToday(day)}, `day-${day.format('DDD')}`]" class="day"
                    v-on:click="selectDate(day);">
                 <div class="day-number">{{ day.format('D') }}</div>
               </div>
@@ -76,7 +95,7 @@
 </template>
 
 <script setup>
-import {ref, computed} from "vue";
+import {ref, computed, onMounted} from "vue";
 import moment from "moment"
 import Time from "./Time.vue";
 import Templates from "./Templates.vue";
@@ -89,8 +108,9 @@ let props = defineProps({
 let year = moment().year()
 let month = moment().format("MMMM")
 //Moment variables for readable code *end*
+let startDateInit = ref(false)
+let endDateInit = ref(false)
 
-let range = ref([])
 let endDateInput = ref(null)
 let startDateInput = ref(null)
 
@@ -109,42 +129,88 @@ let end = ref({
   year: null
 })
 
-let selecting = ref(false)
-
-let startDateInit = ref(false)
-let endDateInit = ref(false)
-
 let showCalendar = ref(false)
 
+// For time (hh:mm) component
 let time = ref({
   startDayHour: null,
   startDayMinutes: null,
   endDayHour: null,
   endDayMinutes: null,
 })
+
+let range = ref([])
 ////////////////////////////////////////////////////////////////////////////////////////////
-// Calendar logic *start*
 let monthStart = moment().startOf('month');
 let monthEnd = moment().endOf('month');
 
 let startTime = ref(monthStart)
 let endTime = ref(monthEnd)
 
+let secondMonthStart = moment().add(1, 'month').startOf('month');
+let secondMonthEnd = moment().add(1, 'month').endOf('month');
 
+let secondStartTime = ref(secondMonthStart)
+let secondEndTime = ref(secondMonthEnd)
+////////////////////////////////////////////////////////////////////////////////////////////
+
+let getCurrentMonth = (queue) => {
+  if (queue < 1) {
+    return startTime.value.format('MMMM')
+  } else {
+    return secondStartTime.value.format('MMMM')
+  }
+}
+
+let getCurrentYear = computed(() => {
+  return startTime.value.format('YYYY');
+})
+
+// Previous/next month/year
 let previous = (unit) => {
-  startTime.value = startTime.value.clone().subtract(1, `${unit}`);
-  endTime.value = endTime.value.clone().subtract(1, `${unit}`);
+  startTime.value = startTime.value.clone().subtract(2, `${unit}`);
+  endTime.value = endTime.value.clone().subtract(2, `${unit}`);
+  secondStartTime.value = secondStartTime.value.clone().subtract(2, `${unit}`);
+  secondEndTime.value = secondEndTime.value.clone().subtract(2, `${unit}`);
+
 }
 let next = (unit) => {
-  startTime.value = startTime.value.clone().add(1, `${unit}`);
-  endTime.value = endTime.value.clone().add(1, `${unit}`);
+  startTime.value = startTime.value.clone().add(2, `${unit}`);
+  endTime.value = endTime.value.clone().add(2, `${unit}`);
+  secondStartTime.value = secondStartTime.value.clone().add(2, `${unit}`);
+  secondEndTime.value = secondEndTime.value.clone().add(2, `${unit}`);
 }
-let getFirstMonthWeeks = () => {
+
+// Which date (start or end) is user selecting
+let initDay = (day) => {
+  showCalendar.value = true
+  if (day === 'start') {
+    startDateInit.value = true
+    endDateInit.value = false
+  } else {
+    startDateInit.value = false
+    endDateInit.value = true
+  }
+}
+
+// Arrays of days and weeks in months
+let getFirstMonthWeeks = (queue) => {
   let firstMonthDays = [];
-  let currentDay = startTime.value.clone().startOf('week');
-  while (currentDay.isBefore(startTime.value.clone().endOf('month'))) {
-    firstMonthDays.push(currentDay);
-    currentDay = currentDay.clone().add(1, 'day');
+  let currentDay
+  // if first month to show
+  if (queue < 1) {
+    currentDay = startTime.value.clone().startOf('week');
+    while (currentDay.isBefore(startTime.value.clone().endOf('month'))) {
+      firstMonthDays.push(currentDay);
+      currentDay = currentDay.clone().add(1, 'day');
+    }
+    // if second month to show
+  } else {
+    currentDay = secondStartTime.value.clone().startOf('week');
+    while (currentDay.isBefore(secondStartTime.value.clone().endOf('month'))) {
+      firstMonthDays.push(currentDay);
+      currentDay = currentDay.clone().add(1, 'day');
+    }
   }
   return chunkByWeek(firstMonthDays);
 }
@@ -152,6 +218,7 @@ let isToday = (day) => {
   return moment().isSame(day, 'day');
 }
 
+// Chunk months by week
 let chunkByWeek = (arr) => {
   let result = [];
   let temp = [];
@@ -176,29 +243,8 @@ let getWeekDays = (week) => {
   return result;
 }
 
-
-let getCurrentMonth = computed(() => {
-  return startTime.value.format('MMMM');
-})
-
-let getCurrentYear = computed(() => {
-  return startTime.value.format('YYYY');
-})
-// Calendar logic *end*
-/////////////////////////////////////////////////////////////////////////////////////////////////
-let initDay = (day) => {
-  showCalendar.value = true
-  if (day === 'start') {
-    startDateInit.value = true
-    endDateInit.value = false
-  } else {
-    startDateInit.value = false
-    endDateInit.value = true
-  }
-}
-// Selecting dates
+// Selecting and validating dates
 let selectDate = (day) => {
-  selecting.value = true
   if (startDateInit.value === true) {
     end.value.day = null
     end.value.month = null
@@ -238,12 +284,6 @@ let selectDate = (day) => {
   }
 }
 
-let colorDay = (day) => {
-  let days = Array.from(document.getElementsByClassName('day'))
-  days.forEach((item, id) => {
-    day.format('D') === id + 1 ? item.classList.add('selected') : item.classList.remove('selected')
-  })
-}
 // Data from time component emiter
 let timeSet = (childArr) => {
   time.value.startDayHour = childArr[0]
