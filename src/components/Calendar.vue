@@ -79,7 +79,7 @@
             </div>
             <div class="calendar-row" v-for="week in getFirstMonthWeeks(1)">
               <div v-for="day in getWeekDays(week)"
-                   :class="[{ today: isToday(day)}, `day-${day.format('DDD')}`]" class="day"
+                   :class="`day-${day.format('DDD')}`" class="day"
                    v-on:click="selectDate(day);">
                 <div class="day-number">{{ day.format('D') }}</div>
               </div>
